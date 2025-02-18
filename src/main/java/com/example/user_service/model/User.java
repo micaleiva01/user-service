@@ -1,6 +1,7 @@
 package com.example.user_service.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @Table(name = "users")
@@ -14,10 +15,18 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role; // USUARIO o ADMIN
+    private Role role; // USER o ADMIN
+
+    public User() {
+        this.role = Role.USER; // USER por default
+    }
+
+    public void setPassword(String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        this.password = encoder.encode(password);
+    }
 
 
-    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -25,7 +34,6 @@ public class User {
     public void setEmail(String email) { this.email = email; }
 
     public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

@@ -1,28 +1,67 @@
 package com.example.user_service.controller;
 
+import com.example.user_service.dto.UserDTO;
 import com.example.user_service.model.User;
-import com.example.user_service.repository.UserRepository;
+import com.example.user_service.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private IUserService userService;
 
-    @PostMapping("/user")
-    User newUser(@RequestBody User newUser){
-        return userRepository.save(newUser);
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestBody User newUser) {
+        String result = userService.registerUser(newUser);
+        return result.equals("Usuario registrado con exito!") ? ResponseEntity.ok(result) : ResponseEntity.badRequest().body(result);
     }
 
-    @GetMapping("/users")
-    List<User> getUsers(){
-        return userRepository.findAll();
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginRequest) {
+        String username = loginRequest.get("username");
+        String password = loginRequest.get("password");
+
+        System.out.println("🔹 Received Username: [" + username + "]");
+        System.out.println("🔹 Received Password: [" + password + "]");
+
+        if (username == null || password == null) {
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Missing username or password"));
+        }
+
+        String token = userService.loginUser(username, password);
+
+        if (token.equals("Nombre de usuario o contraseña invalida")) {
+            return ResponseEntity.status(401).body(Collections.singletonMap("error", token));
+        }
+
+        return ResponseEntity.ok(Collections.singletonMap("token", token));
+    }
+
+
+    @GetMapping("/userinfo")
+    public ResponseEntity<UserDTO> getUserDetails(@RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        Optional<UserDTO> user = userService.getUserByUsername(userService.getUsernameFromToken(token));
+
+        return user.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    @GetMapping("/userlist")
+    public List<UserDTO> getUsers() {
+        return userService.getAllUsers();
     }
 }
