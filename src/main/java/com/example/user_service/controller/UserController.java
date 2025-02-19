@@ -64,4 +64,5 @@ public class UserController {
     public List<UserDTO> getUsers() {
         return userService.getAllUsers();
     }
+
 }

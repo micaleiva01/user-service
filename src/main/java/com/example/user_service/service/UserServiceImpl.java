@@ -2,8 +2,10 @@ package com.example.user_service.service;
 
 import com.example.user_service.dao.IUserDAO;
 import com.example.user_service.dto.UserDTO;
+import com.example.user_service.model.Role;
 import com.example.user_service.model.User;
 import com.example.user_service.config.JwtUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
