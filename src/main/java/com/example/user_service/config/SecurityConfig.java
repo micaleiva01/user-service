@@ -5,32 +5,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //.cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
-                       // .requestMatchers("/api/users").permitAll()
-                        .requestMatchers("/users/login").permitAll()
-                        .requestMatchers("/users/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                );
+                .csrf(csrf -> csrf.disable()) // Disable CSRF
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // Allow all requests
+                .formLogin(login -> login.disable()) // Disable login page
+                .httpBasic(basic -> basic.disable()); // Disable basic auth
         return http.build();
     }
 }

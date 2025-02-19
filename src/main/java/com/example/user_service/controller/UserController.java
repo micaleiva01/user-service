@@ -4,6 +4,7 @@ import com.example.user_service.dto.UserDTO;
 import com.example.user_service.model.User;
 import com.example.user_service.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,20 +30,15 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
-
         System.out.println("🔹 Received Username: [" + username + "]");
         System.out.println("🔹 Received Password: [" + password + "]");
-
         if (username == null || password == null) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Missing username or password"));
         }
-
         String token = userService.loginUser(username, password);
-
-        if (token.equals("Nombre de usuario o contraseña invalida")) {
-            return ResponseEntity.status(401).body(Collections.singletonMap("error", token));
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Invalid username or password"));
         }
-
         return ResponseEntity.ok(Collections.singletonMap("token", token));
     }
 

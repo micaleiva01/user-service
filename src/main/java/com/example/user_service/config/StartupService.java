@@ -21,25 +21,25 @@ public class StartupService {
     }
 
     @PostConstruct
-    @Transactional
+    //@Transactional
     public void createDefaultAdmin() {
-        System.out.println("Checking if default admin exists...");
+        System.out.println("Revisando si ya existe un admin default...");
 
         if (userDAO.findByUsername("admin").isPresent()) {
-            System.out.println("Admin user already exists. Skipping creation.");
+            System.out.println("Admin ya existe. No se creara un default nuevo");
             return;
         }
 
-        System.out.println("Creating default admin...");
+        System.out.println("Creando admin default...");
 
         User admin = new User();
         admin.setUsername("admin");
         admin.setEmail("admin@example.com");
-        admin.setPassword(passwordEncoder.encode("admin")); // Use password encoder
+        admin.setPassword(passwordEncoder.encode("admin"));
         admin.setRole(Role.ADMIN);
 
         userDAO.save(admin);
-        System.out.println("Admin successfully created!");
+        System.out.println("Admin creado!");
     }
 }
 

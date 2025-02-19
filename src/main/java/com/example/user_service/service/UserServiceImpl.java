@@ -26,6 +26,11 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @PostConstruct
+    public void checkJwtUtilInjection() {
+        System.out.println("JwtUtil instance: " + jwtUtil);
+    }
+
     @Override
     public String registerUser(User user) {
         if (userDAO.findByUsername(user.getUsername()).isPresent() ||
@@ -33,15 +38,13 @@ public class UserServiceImpl implements IUserService {
             return "Username or email already taken";
         }
 
-        // 🔹 Only encode if password is not already hashed
         if (!user.getPassword().startsWith("$2a$10$")) { // BCrypt hashes start with "$2a$10$"
-            System.out.println("🔹 Raw Password Before Hashing: [" + user.getPassword() + "]");
+            System.out.println("Raw Password Before Hashing: [" + user.getPassword() + "]");
             user.setPassword(passwordEncoder.encode(user.getPassword())); // Encode only if it's not already hashed
-            System.out.println("🔹 Hashed Password: [" + user.getPassword() + "]");
+            System.out.println("Hashed Password: [" + user.getPassword() + "]");
         } else {
-            System.out.println("⚠️ Warning: Password is already hashed, skipping encoding.");
+            System.out.println("Warning: Password is already hashed, skipping encoding.");
         }
-
         userDAO.save(user);
         return "User registered successfully";
     }
@@ -49,26 +52,26 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public String loginUser(String username, String password) {
-        Optional<User> userOpt = userDAO.findByUsername(username);
+        Optional<User> userOptional = userDAO.findByUsername(username);
 
-        if (userOpt.isEmpty()) {
-            return "No se ha encontrado usuario";
+        if (userOptional.isEmpty()) {
+            return "Ingresar nombre de usuario o contraseña";
         }
 
-        User user = userOpt.get();
+        User user = userOptional.get();
 
-        System.out.println("🔹 Raw Password Entered: [" + password + "]");
-        System.out.println("🔹 Stored Hashed Password: [" + user.getPassword() + "]");
-
-        boolean match = passwordEncoder.matches(password, user.getPassword());
-        System.out.println("🔹 Password Matches: " + match);
-
-        if (!match) {
+        // Check password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             return "Nombre de usuario o contraseña invalida";
         }
 
-        return jwtUtil.generateToken(user);
+        // 🔹 Ensure JWT is being generated
+        String token = jwtUtil.generateToken(user);
+        System.out.println("🔹 Generated Token: " + token);  // Debugging
+
+        return token;
     }
+
 
 
     @Override

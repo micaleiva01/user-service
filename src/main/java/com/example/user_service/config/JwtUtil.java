@@ -11,18 +11,19 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    // Secure 256-bit key
     private static final String SECRET_KEY = "bIuh7NxHgf67oPjBd7fA29D6bFQz8XcE79vUhN8zV9U=";
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 day
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
     public String generateToken(User user) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("role", user.getRole().name())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
+        System.out.println("🔹 Generated Token: " + token);
+        return token;
     }
 
     public String extractUsername(String token) {
