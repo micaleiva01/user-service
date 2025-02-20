@@ -1,6 +1,7 @@
 package com.example.user_service.service;
 
 import com.example.user_service.dto.UserDTO;
+import com.example.user_service.model.Role;
 import com.example.user_service.model.User;
 
 import java.util.List;
@@ -14,5 +15,6 @@ public interface IUserService {
     Optional<UserDTO> getUserByUsername(String username);
     List<UserDTO> getAllUsers();
     String getUsernameFromToken(String token);
-
+    Optional<User> getUserEntityById(Long id);
+    void saveUser(User user);
 }

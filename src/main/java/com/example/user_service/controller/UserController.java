@@ -1,6 +1,7 @@
 package com.example.user_service.controller;
 
 import com.example.user_service.dto.UserDTO;
+import com.example.user_service.model.Role;
 import com.example.user_service.model.User;
 import com.example.user_service.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,4 +62,23 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+
+    @PutMapping("/userlist/{id}/promote")
+    public ResponseEntity<?> promoteUserToAdmin(@PathVariable Long id) {
+        Optional<UserDTO> userOptional = userService.getUserById(id);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        Optional<User> user = userService.getUserEntityById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        if (user.get().getRole() == Role.ADMIN) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User is already an admin");
+        }
+        user.get().setRole(Role.ADMIN);
+        userService.saveUser(user.get());
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "User promoted to admin successfully"));
+    }
 }

@@ -95,4 +95,14 @@ public class UserServiceImpl implements IUserService {
     public String getUsernameFromToken(String token) {
         return jwtUtil.extractUsername(token);
     }
+
+    @Override
+    public Optional<User> getUserEntityById(Long id) {
+        return userDAO.findById(id);
+    }
+
+    @Override
+    public void saveUser(User user) {
+        userDAO.save(user);
+    }
 }
