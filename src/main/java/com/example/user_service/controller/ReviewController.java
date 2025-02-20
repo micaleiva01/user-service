@@ -70,4 +70,3 @@ public class ReviewController {
     @PutMapping("/test")
     public ResponseEntity<String> testPut() { return ResponseEntity.ok("PUT endpoint is working"); }
 }
-
