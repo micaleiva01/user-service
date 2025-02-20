@@ -13,8 +13,9 @@ public interface IUserService {
     String loginUser(String username, String password);
     Optional<UserDTO> getUserById(Long id);
     Optional<UserDTO> getUserByUsername(String username);
+    Optional<User> getUserEntityById(Long id);
     List<UserDTO> getAllUsers();
     String getUsernameFromToken(String token);
-    Optional<User> getUserEntityById(Long id);
     void saveUser(User user);
+    Optional<User> getUserEntityByUsername(String usernameFromToken);
 }

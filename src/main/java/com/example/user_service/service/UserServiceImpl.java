@@ -2,6 +2,7 @@ package com.example.user_service.service;
 
 import com.example.user_service.dao.IUserDAO;
 import com.example.user_service.dto.UserDTO;
+import com.example.user_service.model.Review;
 import com.example.user_service.model.Role;
 import com.example.user_service.model.User;
 import com.example.user_service.config.JwtUtil;
@@ -60,19 +61,15 @@ public class UserServiceImpl implements IUserService {
 
         User user = userOptional.get();
 
-        // Check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             return "Nombre de usuario o contraseña invalida";
         }
 
-        // 🔹 Ensure JWT is being generated
         String token = jwtUtil.generateToken(user);
-        System.out.println("🔹 Generated Token: " + token);  // Debugging
+        System.out.println("🔹 Generated Token: " + token);
 
         return token;
     }
-
-
 
     @Override
     public Optional<UserDTO> getUserById(Long id) {
@@ -96,13 +93,22 @@ public class UserServiceImpl implements IUserService {
         return jwtUtil.extractUsername(token);
     }
 
+
+    @Override
+    public Optional<User> getUserEntityByUsername(String username) {
+        return userDAO.findByUsername(username);
+    }
+
+
     @Override
     public Optional<User> getUserEntityById(Long id) {
         return userDAO.findById(id);
     }
 
+
     @Override
     public void saveUser(User user) {
         userDAO.save(user);
     }
+
 }
